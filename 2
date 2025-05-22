@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>David Jan Slaba - Cyberpunk Vizitka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a12;
+            --card-bg: #151525;
+            --text-color: white;
+            --accent-color: #0ff;
+            --highlight-color: #f0f;
+            --shadow-color: rgba(0, 255, 255, 0.5);
+            --laser-color: rgba(0, 255, 255, 0.2);
+        }
+
+        .day-mode {
+            --bg-color: #f0f0f8;
+            --card-bg: #e0e0e8;
+            --text-color: #151525;
+            --accent-color: #0088aa;
+            --highlight-color: #aa0088;
+            --shadow-color: rgba(0, 136, 170, 0.5);
+            --laser-color: rgba(0, 136, 170, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: color 0.3s, background-color 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--text-color);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            background: var(--card-bg);
+            border: 2px solid var(--accent-color);
+            color: var(--text-color);
+            font-family: 'Orbitron', sans-serif;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px var(--shadow-color);
+            transition: all 0.3s;
+        }
+
+        .mode-toggle:hover {
+            background-color: var(--accent-color);
+            color: var(--card-bg);
+        }
+
+        .container {
+            width: 340px;
+            height: 214px;
+            position: relative;
+            perspective: 1000px;
+            z-index: 10;
+            transition: transform 0.5s, box-shadow 0.5s;
+        }
+
+        .container:hover {
+            box-shadow: 
+                0 0 20px var(--accent-color),
+                0 0 40px var(--accent-color),
+                0 0 60px var(--accent-color);
+            transform: translateY(-5px);
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 20px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .name {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            color: var(--text-color);
+        }
+
+        .profession {
+            font-size: 12px;
+            color: var(--accent-color);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .contact-info {
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .info-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-label {
+            color: var(--accent-color);
+            font-size: 10px;
+            width: 60px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-value {
+            font-size: 12px;
+            letter-spacing: 1px;
+            color: var(--text-color);
+        }
+
+        .info-value a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .info-value a:hover {
+            color: var(--highlight-color);
+            text-shadow: 0 0 8px var(--highlight-color);
+        }
+
+        .barcode {
+            height: 30px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            z-index: 2;
+        }
+
+        .barcode-line {
+            width: 2px;
+            background-color: var(--text-color);
+            margin: 0 1px;
+            height: 100%;
+            animation: barcode-scan 3s infinite;
+        }
+
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: var(--accent-color);
+            z-index: 5;
+        }
+
+        .corner-tl {
+            top: 10px;
+            left: 10px;
+            border-top: 2px solid;
+            border-left: 2px solid;
+        }
+
+        .corner-tr {
+            top: 10px;
+            right: 10px;
+            border-top: 2px solid;
+            border-right: 2px solid;
+        }
+
+        .corner-bl {
+            bottom: 10px;
+            left: 10px;
+            border-bottom: 2px solid;
+            border-left: 2px solid;
+        }
+
+        .corner-br {
+            bottom: 10px;
+            right: 10px;
+            border-bottom: 2px solid;
+            border-right: 2px solid;
+        }
+
+        /* Laser beams */
+        .laser-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .laser {
+            position: absolute;
+            background: var(--laser-color);
+            transform-origin: 0 0;
+        }
+
+        .laser-h {
+            height: 1px;
+            width: 100%;
+            animation: laser-move-h 8s infinite linear;
+        }
+
+        .laser-v {
+            width: 1px;
+            height: 100%;
+            animation: laser-move-v 12s infinite linear;
+        }
+
+        @keyframes laser-move-h {
+            0% {
+                top: 0%;
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                top: 100%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes laser-move-v {
+            0% {
+                left: 0%;
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes barcode-scan {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            75% {
+                opacity: 0.9;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mode-toggle" id="modeToggle">Day Mode</button>
+
+    <div class="laser-container" id="laserContainer">
+        <!-- Lasers will be added by JavaScript -->
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            
+            <div class="header">
+                <h1 class="name">David Jan Slaba</h1>
+                <p class="profession">Fotograf</p>
+            </div>
+            
+            <div class="contact-info">
+                <div class="info-item">
+                    <span class="info-label">Tel:</span>
+                    <span class="info-value"><a href="tel:+420777123456">+420 777 123 456</a></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value"><a href="mailto:alex.novak@neonmail.cz">alex.novak@neonmail.cz</a></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Adresa:</span>
+                    <span class="info-value">Ulice 1337, 110 00 Praha</span>
+                </div>
+            </div>
+            
+            <div class="barcode" id="barcode"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate barcode lines
+            const barcode = document.getElementById('barcode');
+            const lineCount = 40;
+            
+            for (let i = 0; i < lineCount; i++) {
+                const line = document.createElement('div');
+                line.className = 'barcode-line';
+                line.style.height = `${Math.random() * 70 + 30}%`;
+                line.style.animationDelay = `${Math.random() * 3}s`;
+                barcode.appendChild(line);
+            }
+            
+            // Create laser beams
+            const laserContainer = document.getElementById('laserContainer');
+            
+            // Create horizontal lasers
+            for (let i = 0; i < 10; i++) {
+                const laser = document.createElement('div');
+                laser.className = 'laser laser-h';
+                laser.style.animationDelay = `${Math.random() * 8}s`;
+                laser.style.top = `${Math.random() * 100}%`;
+                laser.style.height = `${Math.random() * 1 + 0.5}px`;
+                laser.style.opacity = Math.random() * 0.5 + 0.2;
+                laserContainer.appendChild(laser);
+            }
+            
+            // Create vertical lasers
+            for (let i = 0; i < 10; i++) {
+                const laser = document.createElement('div');
+                laser.className = 'laser laser-v';
+                laser.style.animationDelay = `${Math.random() * 12}s`;
+                laser.style.left = `${Math.random() * 100}%`;
+                laser.style.width = `${Math.random() * 1 + 0.5}px`;
+                laser.style.opacity = Math.random() * 0.5 + 0.2;
+                laserContainer.appendChild(laser);
+            }
+            
+            // Day/Night mode toggle
+            const modeToggle = document.getElementById('modeToggle');
+            let isDayMode = false;
+            
+            modeToggle.addEventListener('click', function() {
+                isDayMode = !isDayMode;
+                if (isDayMode) {
+                    document.body.classList.add('day-mode');
+                    modeToggle.textContent = 'Night Mode';
+                } else {
+                    document.body.classList.remove('day-mode');
+                    modeToggle.textContent = 'Day Mode';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
